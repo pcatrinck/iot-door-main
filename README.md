@@ -1,10 +1,7 @@
 # iot-door-main
 
-<html>
- <head>
-  <title>how should you organize the files.<\br></title>
- </head>
- <body>
+how should you organize the files
+
   Documents
   . Arduino
     .. door-main
@@ -16,6 +13,4 @@
       ... printh
         .... keywords.txt
         .... printh.cpp
-       .... printh.h
- </body>
-</html>
+        .... printh.h
