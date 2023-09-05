@@ -1,4 +1,5 @@
 extern bool allowed;
+extern String userName;
 
 void rfid_loop()
 {
@@ -41,20 +42,20 @@ void rfid_loop()
       if (cardUID.equals(authorizedCards[i].cardUID)) {
         Serial.println("Card is authorized.");
         Serial.println("User: " + authorizedCards[i].userName);
+        Serial.println("");
         allowed = true;
+        userName = authorizedCards[i].userName;
         break;  // Exit the loop since we found a match
     }
       else {
         Serial.println("Denied access.");
+        Serial.println("");
       }
   }
 
     Serial.println(F("The NUID tag is:"));
     Serial.print(F("In hex: "));
     printer.printHex(rfid.uid.uidByte, rfid.uid.size);
-    Serial.println();
-    Serial.print(F("In dec: "));
-    printer.printDec(rfid.uid.uidByte, rfid.uid.size);
     Serial.println();
 
   // Halt PICC
