@@ -1,5 +1,0 @@
-printh		KEYWORD1
-prt_h		KEYWORD2
-printHex	KEYWORD2
-printDec 	KEYWORD2
-getUIDAsString	KEYWORD2

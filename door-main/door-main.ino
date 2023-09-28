@@ -1,27 +1,32 @@
+#include <printh.h>
+#include <string.h>
 
+
+
+//********************  MFRC522 ***************************
 #include <SPI.h>
 #include <MFRC522.h>
-#include <printh.h>
 #include "CardInfo.h"
-#include <string.h>
-#include <Wire.h>
-#include <LiquidCrystal_I2C.h>
 
-constexpr uint8_t RST_PIN = D3;
-constexpr uint8_t SS_PIN  = D4;
-int OPEN_SIGNAL = D8;
+constexpr uint8_t RST_PIN = 22;
+constexpr uint8_t SS_PIN  = 21;
 
 MFRC522 rfid(SS_PIN, RST_PIN); // Instance of the class
 MFRC522::MIFARE_Key key;
+byte nuidPICC[4];     // Init array that will store new NUID
+prt_h printer;        // Create an instance of the prt_h class
+//**********************************************************
 
-// Init array that will store new NUID
-byte nuidPICC[4];
 
-// Create an instance of the prt_h class
-prt_h printer;
 
-// Create LCD object
-LiquidCrystal_I2C LCD = LiquidCrystal_I2C(0x27, 16, 2);
+//******************** LCD DISPLAY *************************
+#include <Wire.h>
+#include <LiquidCrystal_I2C.h>
+
+#define I2C_SDA 33
+#define I2C_SCL 32
+
+LiquidCrystal_I2C LCD = LiquidCrystal_I2C(0x27, 16, 2);                      // Create LCD object
 
 // Personalized char for 16x2 display
 byte ClosedLock[] = {B01110, B01010, B01010, B11111, B10001, B10101, B10001, B11111};
@@ -30,74 +35,44 @@ byte Smile[] = {B00000, B01010, B01010, B01010, B00000, B10001, B01110, B00000};
 byte e[] = {B00010,B00100,B01110,B10001,B11111,B10000,B01110,B00000};
 byte i[] = {B00001,B00010,B01100,B00100,B00100,B00100,B01110,B00000};
 byte o[] = {B00100,B01010,B01110,B10001,B10001,B10001,B01110,B00000};
+//**********************************************************
 
-// Bool for door control
-bool allowed = false;
 
-// String for user name
-String  userName = "";
+
+//******************** wifi connection *********************
+#include <WiFi.h>
+ 
+const char* ssid = "*************";
+const char* password = "*************";
+
+WiFiServer server(80);
+//**********************************************************
+
+
+
+//********************* CODE ASSISTENCE **********************
+int OPEN_SIGNAL = 32;
+bool allowed = false;       // Bool for door control
+bool faraday = false;       // Bool for door control
+String  userName = "";      // String for user name
+//************************************************************
+
 
 void setup() {
-  Serial.begin(9600);
-  pinMode(D8, OUTPUT);
-  rfid_setup();
+  Wire.begin(I2C_SDA, I2C_SCL);
 
-  //display_setup();
-  LCD.init();
-  LCD.backlight();
-  LCD.createChar(0, ClosedLock);
-  LCD.createChar(1, OpenLock);
-  LCD.createChar(2, Smile);
-  LCD.createChar(3, e);
-  LCD.createChar(4, i);
-  LCD.createChar(5, o);
-  LCD.setCursor(0, 0);
-  LCD.print("SALA DO PET ");
-  LCD.write(byte(2));
-  LCD.print("    ");
-  LCD.setCursor(0, 1);
-  LCD.write(byte(0));
-  LCD.print(" INSIRA SUA TAG");
+  Serial.begin(9600);
+  pinMode(32, OUTPUT);
+  
+  wifi_setup();
+  rfid_setup();
+  display_setup();
 }
 
 void loop() {
-
-  rfid_loop();
-
-  //display_loop();
-  if (allowed) {
-    LCD.setCursor(0, 0);
-    LCD.write(byte(1));
-    LCD.print(" ABERTO POR:");
-    LCD.setCursor(0, 1);
-    LCD.print(userName);
-
-    if(userName == "Antonio Sant'Ana") {
-      LCD.setCursor(3, 1);
-      LCD.write(byte(5));
-    }
-
-    else if(userName == "Lais Decote     ") {
-      LCD.setCursor(2, 1);
-      LCD.write(byte(4));
-      LCD.setCursor(10, 1);
-      LCD.write(byte(3));
-    }
-    
-    digitalWrite(D8, HIGH);
-    delay(3000);
-    digitalWrite(D8, LOW);
-
-    // !!!!!!!!!!!!! fazer uma função pra preencher a tela padrão
-    LCD.createChar(0, ClosedLock);
-    LCD.createChar(1, OpenLock);
-    LCD.createChar(2, Smile);
-    LCD.setCursor(0, 0);
-    LCD.print("SALA DO PET ");
-    LCD.write(byte(2));
-    LCD.setCursor(0, 1);
-    LCD.write(byte(0));
-    LCD.print(" INSIRA SUA TAG");
-    allowed = false;
-  }
+  Serial.println("IP adress: ");
+  Serial.println(WiFi.localIP());
+  wifi_loop();     //set faraday true
+  rfid_loop();     //set allowed true
+  display_loop();  //open door
 }

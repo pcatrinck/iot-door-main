@@ -13,7 +13,7 @@ const int numAuthorizedCards = 17; // Specify the number of authorized cards
 struct CardInfo authorizedCards[] = {
     {"69f784c2", "Antonio Sant'Ana"}, //16 + "\n"
     {"f94288c1", "Arthur Bandeira "},
-    {"1721767b", "Arthur Fiorio   "},
+    {"c6c2005c", "Arthur Fiorio   "},
     {"897086c2", "Bernardo Canal  "},
     {"f90475c1", "Bruno Rodrigues "},
     {"9ba84e43", "Daudson Andrade "},
